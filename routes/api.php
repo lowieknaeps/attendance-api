@@ -20,12 +20,12 @@ use App\Http\Controllers\Api\ImportController;
 Route::post('/status', [StatusController::class, 'store']);          // enkel record
 Route::post('/status/batch', [StatusController::class, 'storeBatch']); // batch
 
+Route::post('/import/statuses', [ImportController::class, 'statuses'])
+    ->name('api.import.statuses');
 
-Route::post('/import/statuses', [ImportController::class, 'statuses']);
-Route::get('/import', [ImportController::class, 'index']); 
 
 
-// Als je token-auth wil:
+// token-auth wil:
 // Route::middleware('auth:sanctum')->post('/status', [StatusController::class,'store']);
 // Route::middleware('auth:sanctum')->post('/status/batch', [StatusController::class,'storeBatch']);
 
