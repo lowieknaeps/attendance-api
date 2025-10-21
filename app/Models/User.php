@@ -14,9 +14,9 @@ class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-      public function canAccessPanel(Panel $panel): bool   // ⬅️ verplicht voor Filament
+      public function canAccessPanel(Panel $panel): bool  
     {
-        // heel basic: iedereen met een account mag het admin panel in
+        //iedereen met een account mag het admin panel in
         return true;
 
         // of bvb. enkel bepaalde mails:
