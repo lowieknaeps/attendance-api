@@ -41,4 +41,13 @@ class TopLateStudents extends BaseWidget
     {
         return 10;
     }
+
+    /*
+     * The table uses an aggregated query (groupBy) and therefore rows do not have the Eloquent primary key.
+     * Filament expects a non-null string key for each record; return the external_id as the record key.
+     */
+    public function getTableRecordKey(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return (string) ($record->external_id ?? $record->id ?? '');
+    }
 }

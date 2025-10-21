@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 
 class TodayStats extends BaseWidget
 {
-    // non-static (dus zonder 'static')
+
     protected ?string $heading = 'Vandaag – overzicht';
 
     protected function getCards(): array
@@ -25,7 +25,6 @@ class TodayStats extends BaseWidget
             Card::make('Aanwezig', $present),
             Card::make('Te laat', $late),
             Card::make('Afwezig', $absent),
-            Card::make('Unieke studenten vandaag', $unique),
         ];
     }
 }
