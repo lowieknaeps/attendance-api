@@ -10,6 +10,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 
+
 class AttendanceResource extends Resource
 {
     protected static ?string $model = Attendance::class;
@@ -67,6 +68,7 @@ class AttendanceResource extends Resource
             \App\Filament\Widgets\TodayStats::class,
             \App\Filament\Widgets\TodayStatusDonut::class,
             \App\Filament\Widgets\TopLateStudents::class,
+            \App\Filament\Widgets\WeekAttendanceChart::class,
         ];
     }
 }

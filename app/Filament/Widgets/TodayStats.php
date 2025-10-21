@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 
 class TodayStats extends BaseWidget
 {
-
+    // non-static (dus zonder 'static')
     protected ?string $heading = 'Vandaag – overzicht';
 
     protected function getCards(): array

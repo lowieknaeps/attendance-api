@@ -13,7 +13,7 @@ class AttendanceController extends Controller
     $data = $request->validate([
         'items' => ['required','array','min:1'],
         'items.*.ID'          => ['nullable','integer'],     // uit Python
-        'items.*.external_id' => ['nullable','integer'],     // of al gemapt
+        'items.*.external_id' => ['nullable','integer'],     // al gemapt
         'items.*.name'        => ['required','string','max:255'],
         'items.*.arrived'     => ['nullable','date'],
         'items.*.status'      => ['required','string','max:50'],

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class TodayStatusDonut extends ChartWidget
 {
     protected static ?string $heading = 'Aanwezigheden vandaag';
-    protected static ?string $pollingInterval = '30s'; // auto-refresh 
+    protected static ?string $pollingInterval = '30s'; // auto-refresh (optioneel)
 
     protected function getData(): array
     {
