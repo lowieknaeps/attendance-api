@@ -31,7 +31,7 @@ class ChooseCourses extends Page implements HasForms
             'course_ids' => $selected,
         ]);
     }
-
+    //Kiezen van vakken
     public function form(Form $form): Form
     {
         return $form
