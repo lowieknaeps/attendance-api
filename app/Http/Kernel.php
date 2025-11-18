@@ -65,4 +65,13 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
+    protected function schedule(\Illuminate\Console\Scheduling\Schedule $schedule): void
+    {
+        $schedule->command('attendance:archive-yesterday')->dailyAt('00:05');
+        $schedule->command('attendance:alerts')->everyFiveMinutes();
+    }
+
+    
+
+
 }

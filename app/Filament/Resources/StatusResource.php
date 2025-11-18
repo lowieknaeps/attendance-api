@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
+use Filament\Actions;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Http;
 
 class StatusResource extends Resource
 {
@@ -74,4 +77,32 @@ class StatusResource extends Resource
             'edit' => Pages\EditStatus::route('/{record}/edit'),
         ];
     }
+    protected function getHeaderActions(): array
+{
+    return [
+        Actions\CreateAction::make(),
+
+        Actions\Action::make('import')
+            ->label('Importeer data via API')
+            ->icon('heroicon-o-cloud-arrow-up')
+            ->color('success')
+            ->action(function () {
+                $response = Http::acceptJson()->post(route('api.import.statuses'), [
+                    'rows' => [
+                        ['student_id' => 1, 'course_id' => 2, 'present' => true, 'occurred_at' => now()],
+                    ],
+                ]);
+
+                $ok = $response->ok() && $response->json('ok') === true;
+
+                Notification::make()
+                    ->title($ok ? '✅ Import geslaagd' : '❌ Import mislukt')
+                    ->body($ok ? 'Data is ontvangen door de API.' : 'Controleer de logs.')
+                    ->$ok ? 'success' : 'danger'  ();
+            }),
+    ];
+}
+
+
+    
 }

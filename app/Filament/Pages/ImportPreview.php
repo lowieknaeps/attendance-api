@@ -3,44 +3,56 @@
 namespace App\Filament\Pages;
 
 use Filament\Pages\Page;
-use Filament\Forms;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Http;
 
-class ImportPreview extends Page implements Forms\Contracts\HasForms
+class ImportPreview extends Page
 {
-    use Forms\Concerns\InteractsWithForms;
-
-    protected static ?string $navigationIcon = 'heroicon-o-cloud-arrow-down';
-    protected static string $view = 'filament.pages.import-preview';
-
-    public array $formData = ['course_id' => null, 'date' => null];
-    public array $rows = [];
-
+    protected static ?string $navigationIcon = 'heroicon-o-arrow-down-tray';
+    protected static string $view = 'filament.pages.import-preview'; // 
     protected function getFormSchema(): array
     {
-        return [
-            Forms\Components\TextInput::make('course_id')->numeric()->required()->label('Course'),
-            Forms\Components\DatePicker::make('date')->label('Datum'),
-            Forms\Components\Actions::make([
-                Forms\Components\Actions\Action::make('fetch')
-                    ->label('Haal op')
-                    ->action('fetch'),
-            ]),
-        ];
+        return [];
     }
 
-    public function fetch(): void
+    protected function getHeaderActions(): array
     {
-        $query = array_filter([
-            'course_id' => $this->formData['course_id'] ?? null,
-            'date'      => $this->formData['date'] ?? null,
-        ]);
+            return [
+                Action::make('push')
+                    ->label('Importeer naar API')
+                    ->color('success')
+                    ->icon('heroicon-o-cloud-arrow-up')
+                    ->action(function () {
+                        $payload = [
+                            [
+                                'student_id'  => 7,
+                                'course_id'   => 2,
+                                'present'     => true,
+                                'occurred_at' => now()->toIso8601String(),
+                            ],
+                        ];
 
-        $resp = Http::acceptJson()->get(route('api.import'), $query);
-        $this->rows = $resp->successful() ? $resp->json() : [];
-        if (!$resp->successful()) {
-            $this->dispatch('notify', type: 'danger', message: 'Kon API niet ophalen');
-        }
+                        // ⬇︎ stuur 'items' i.p.v. 'rows'
+                        $resp = Http::acceptJson()
+                            ->asJson() // expliciet JSON (mag, is duidelijk)
+                            ->post(route('api.import.statuses'), ['items' => $payload]);
+
+                        if ($resp->successful() && data_get($resp->json(), 'ok') === true) {
+                            Notification::make()
+                                ->title('Import gelukt')
+                                ->body('API antwoordde OK ('.($resp->json('count') ?? 0).' rijen).')
+                                ->success()
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('Import mislukt')
+                                ->body('Status: '.$resp->status().' — '.$resp->body())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
+            ];
     }
-}
 
+}

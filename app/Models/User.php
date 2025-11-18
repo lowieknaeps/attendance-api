@@ -2,55 +2,49 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Filament\Models\Contracts\FilamentUser;   
-use Filament\Panel;                          
 
 class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable;
-
-      public function canAccessPanel(Panel $panel): bool   // ⬅️ verplicht voor Filament
+    public function courses()
     {
-        // heel basic: iedereen met een account mag het admin panel in
-        return true;
-
-        // of bvb. enkel bepaalde mails:
-        // return in_array($this->email, ['admin@admin.com']);
+        return $this->belongsToMany(Course::class)->withTimestamps();
+    }
+    public function attendances()
+    {
+        return $this->hasMany(\App\Models\Attendance::class, 'teacher_id');
     }
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    public function isAdmin(): bool   { return $this->role === 'admin'; }
+    public function isTeacher(): bool { return $this->role === 'teacher'; }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return in_array($this->role, ['admin', 'teacher'], true);
+    }
+
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role',
+        'courses',     
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'courses' => 'array',
     ];
 }
