@@ -51,7 +51,7 @@ return [
     |
     */
 
-    'channels' => [
+    'channels' => [       
         'stack' => [
             'driver' => 'stack',
             'channels' => ['single'],
@@ -126,6 +126,12 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        
+        'scans' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/scans.log'),
+            'level' => 'info',
+        ] 
     ],
 
 ];

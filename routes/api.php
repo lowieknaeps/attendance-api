@@ -2,10 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\StatusController;
-use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\AttendanceController;
-
+use App\Http\Controllers\Api\StudentApiController;
+use App\Http\Controllers\Api\ScanController;
 
 
 
@@ -38,5 +37,7 @@ Route::get('/attendance/student/{external_id}', [AttendanceController::class, 'b
 Route::get('/attendance/top-late-students', [AttendanceController::class, 'topLateStudents']);
 Route::get('/attendance/analytics', [AttendanceController::class, 'analytics']);
 Route::post('/sync/bootstrap', [\App\Http\Controllers\Api\BootstrapSyncController::class, 'sync']);
+Route::get('students', [StudentApiController::class, 'index']);
+Route::post('scans', [ScanController::class, 'store']);
 
 

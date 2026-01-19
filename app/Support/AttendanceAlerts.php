@@ -9,10 +9,6 @@ use Illuminate\Support\Facades\Log;
 
 class AttendanceAlerts
 {
-    /**
-     * Controleer globale drempels voor vandaag.
-     * Retourneert een array met “gebeurtenissen” die zijn overschreden.
-     */
     public static function evaluateDaily(): array
     {
         $now   = Carbon::now();
@@ -21,7 +17,6 @@ class AttendanceAlerts
 
         $thresholds = config('attendance.thresholds');
 
-        // Totaal AFWEZIG vandaag
         $absentToday = Attendance::query()
             ->whereBetween('arrived', [$start, $end])
             ->where('status', 'absent')
@@ -82,11 +77,6 @@ class AttendanceAlerts
 
         return $events;
     }
-
-    /**
-     * Stuur melding naar Filament (indien beschikbaar) en log altijd.
-     */
-    // app/Support/AttendanceAlerts.php
     protected static function notify(string $message, bool $warning = false, bool $danger = false): void
     {
         \Log::info('[AttendanceAlerts] ' . $message);
@@ -100,14 +90,12 @@ class AttendanceAlerts
             elseif ($warning) { $n->warning(); }
             else { $n->success(); }
 
-            // 1) Als je in het panel zit en ingelogd: toon toast + bewaar voor die user
             if (auth()->check() && !app()->runningInConsole() && !request()->expectsJson()) {
                 $n->send();                       // toast
                 $n->sendToDatabase(auth()->user()); // ook bewaren
                 return;
             }
 
-            // 2) API/CLI pad: stuur naar admins (of alle users)
             $recipients = \App\Models\User::query()
                 ->when(\Schema::hasColumn('users','is_admin'), fn($q) => $q->where('is_admin', true))
                 ->get();

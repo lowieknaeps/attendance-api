@@ -16,7 +16,8 @@ class ChooseCourses extends Page implements HasForms
     use InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
-    protected static ?string $title = 'Koppel je vakken';
+    protected static ?string $title = 'Verborgen vakken';
+    protected static ?string $navigationLabel = 'Vakken verbergen';
     protected static string $view = 'filament.pages.choose-courses';
 
     public ?array $data = [];
@@ -25,10 +26,10 @@ class ChooseCourses extends Page implements HasForms
     {
         $user = auth()->user();
 
-        $selected = $user?->courses()->pluck('courses.id')->all() ?? [];
+        $excluded = $user?->courses()->pluck('courses.id')->all() ?? [];
 
         $this->form->fill([
-            'course_ids' => $selected,
+            'excluded_course_ids' => $excluded,
         ]);
     }
 
@@ -36,38 +37,32 @@ class ChooseCourses extends Page implements HasForms
     {
         return $form
             ->schema([
-                MultiSelect::make('course_ids')
-                    ->label('Kies je vakken')
-                    ->options(Course::query()->orderBy('name')->pluck('name', 'id'))
-                    ->required()
+                MultiSelect::make('excluded_course_ids')
+                    ->label('Verberg deze vakken')
+                    ->helperText('Deze vakken zullen niet zichtbaar zijn bij het starten van een sessie')
+                    ->options(
+                        Course::query()
+                            ->orderBy('name')
+                            ->pluck('name', 'id')
+                    )
                     ->searchable(),
             ])
             ->statePath('data');
     }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            Action::make('opslaan')
-                ->label('Opslaan')
-                ->submit('save')
-                ->color('primary')
-                ->icon('heroicon-o-check'),
-        ];
-    }
-
     public function save(): void
     {
         $state = $this->form->getState();
-        $ids = $state['course_ids'] ?? [];
+
+        $ids = $state['excluded_course_ids'] ?? [];
 
         auth()->user()->courses()->sync($ids);
 
         Notification::make()
-            ->title('Vakken gekoppeld')
+            ->title('Verborgen vakken opgeslagen')
             ->success()
             ->send();
 
         $this->redirect('/admin');
     }
+
 }

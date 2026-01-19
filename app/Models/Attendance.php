@@ -10,6 +10,7 @@ class Attendance extends Model
     protected $table = 'attendances';
     protected $fillable = [
         'external_id',
+        'attendance_session_id',   
         'name',
         'arrived',
         'status',
@@ -18,7 +19,12 @@ class Attendance extends Model
         'course_name',
         'room',
         'notes',
+        'source',
     ];
+    protected $casts = [
+    'arrived' => 'datetime',
+    ];
+
     public function teacher()
     {
         return $this->belongsTo(\App\Models\User::class, 'teacher_id');
@@ -26,6 +32,10 @@ class Attendance extends Model
     public function course()
     {
         return $this->belongsTo(Course::class, 'course_id', 'external_id');
+    }
+    public function student()
+    {
+        return $this->belongsTo(Student::class, 'external_id', 'external_id');
     }
     public function scopeToday(Builder $q): Builder
     {

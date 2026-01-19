@@ -10,6 +10,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Models\Course;
 use App\Models\Group;   
+use App\Models\AttendanceSession;
+use App\Models\Student;
 
 class AttendanceController extends Controller
 {
@@ -271,6 +273,54 @@ class AttendanceController extends Controller
             'series'      => $data,
             'generated_at'=> now()->toIso8601String(),
         ]);
+    }
+    public function scan(Request $request)
+    {
+        $data = $request->validate([
+            'student_external_id' => ['required'],
+            'course_id' => ['required','int'],
+            'arrived' => ['nullable','date'],
+            'source' => ['nullable','string'],
+        ]);
+
+        $arrivedAt = isset($data['arrived'])
+            ? \Carbon\Carbon::parse($data['arrived'])
+            : now();
+
+        // Actieve sessie zoeken
+        $session = AttendanceSession::query()
+            ->where('course_external_id', $data['course_id'])
+            ->whereNull('ended_at')
+            ->latest('started_at')
+            ->firstOrFail();
+
+        // Student ophalen
+        $student = Student::where('external_id', $data['student_external_id'])
+            ->firstOrFail();
+
+        // Status bepalen
+        $lateAfterMinutes = 10;
+        $status = $arrivedAt->diffInMinutes($session->started_at) > $lateAfterMinutes
+            ? 'late'
+            : 'present';
+
+        // Absent record updaten (of aanmaken als hij niet bestond)
+        $attendance = Attendance::updateOrCreate(
+            [
+                'attendance_session_id' => $session->id,
+                'external_id' => $student->external_id,
+            ],
+            [
+                'course_id' => $data['course_id'],
+                'name' => $student->name,
+                'group' => $student->group,
+                'status' => $status,
+                'arrived' => $arrivedAt,
+                'source' => $data['source'] ?? 'esp',
+            ]
+        );
+
+        return response()->json($attendance);
     }
     
 }

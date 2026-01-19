@@ -18,11 +18,14 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-
 use App\Filament\Widgets\TodayStats;
 use App\Filament\Widgets\TodayStatusDonut;
 use App\Filament\Widgets\TopLateStudents;
 use App\Filament\Widgets\WeekAttendanceChart;
+use App\Filament\Pages\Auth\Login as CustomLogin;
+use App\Filament\Pages\Auth\Register as CustomRegister;
+use App\Filament\Pages\Auth\KdgLogin;
+use App\Filament\Pages\ScanLogs;    
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -31,12 +34,11 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
-            ->login(Login::class)
-            ->registration(Register::class)
-            ->passwordReset()
-            ->colors([
-                'primary' => Color::Amber,
-            ])
+            ->brandName('KDG Aanwezigheden')
+            ->login(CustomLogin::class) 
+            ->registration(false)
+            ->favicon(asset('favicon.ico'))
+
 
             // resources & pages
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

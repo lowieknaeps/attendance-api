@@ -7,6 +7,9 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Card;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\AttendanceSession;   
+
 
 class TodayStats extends BaseWidget
 {
@@ -14,10 +17,23 @@ class TodayStats extends BaseWidget
 
     protected function getCards(): array
     {
-        $today = Carbon::today(config('app.timezone'))->toDateString();
+        $teacherId = Auth::id();
+        $session = AttendanceSession::query()
+            ->where('teacher_id', $teacherId)
+            ->whereNull('ended_at')
+            ->latest('started_at')
+            ->first();
+
+        if (! $session) {
+            return [
+                Card::make('Aanwezig', 0)->color('success'),
+                Card::make('Te laat', 0)->color('warning'),
+                Card::make('Afwezig', 0)->color('danger'),
+            ];
+        }
 
         $base = Attendance::query()
-            ->whereDate(DB::raw("DATE(COALESCE(arrived, created_at))"), $today);
+            ->where('attendance_session_id', $session->id);
 
         $present = (clone $base)->whereRaw("LOWER(status) = 'present'")->count();
         $late    = (clone $base)->whereRaw("LOWER(status) = 'late'")->count();

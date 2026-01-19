@@ -31,4 +31,15 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'microsoft' => [    
+    'client_id' => env('MICROSOFT_CLIENT_ID'),  
+    'client_secret' => env('MICROSOFT_CLIENT_SECRET'),  
+    'redirect' => env('MICROSOFT_REDIRECT_URI'),
+    'tenant' => env('MICROSOFT_TENANT_ID', 'common'),   
+    ],
+    'canvas' => [
+        'base_url' => env('CANVAS_BASE_URL'),
+        'token' => env('CANVAS_TOKEN'),
+    ],
+
 ];

@@ -7,6 +7,9 @@ use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Filament\Tables;    
+use Filament\Tables\Contracts\HasTable; 
+
 class TopLateStudents extends BaseWidget
 {
     protected static ?string $heading = 'Top laatkomers (laatste 30 dagen)';
@@ -18,7 +21,7 @@ class TopLateStudents extends BaseWidget
             ->where('status', 'late')
             ->select('external_id', 'name', DB::raw('COUNT(*) AS late_count'))
             ->groupBy('external_id', 'name')
-            ->orderByRaw('COUNT(*) DESC');  
+            ->orderByRaw('COUNT(*) DESC');
     }
     protected function getTableColumns(): array
     {
@@ -44,6 +47,16 @@ class TopLateStudents extends BaseWidget
             }
         }
         return (string) ($key ?? 'record');
+    }
+    
+    protected function getTableEmptyStateHeading(): ?string
+    {
+        return 'Geen laatkomers';
+    }
+
+    protected function getTableEmptyStateDescription(): ?string
+    {
+        return 'Er zijn geen studenten te laat gekomen in de afgelopen 30 dagen.';
     }
 }
 

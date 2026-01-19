@@ -14,6 +14,8 @@ return new class extends Migration {
             $table->timestamp('arrived')->nullable(); // aankomsttijd
             $table->string('status'); // aanwezig, afwezig, te laat, etc.
             $table->timestamps();
+            $table->string('source')->nullable();
+            $table->unsignedBigInteger('attendance_session_id')->nullable();
         });
     }
 

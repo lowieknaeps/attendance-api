@@ -9,17 +9,40 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-      public function up(): void
+    public function up(): void
     {
         Schema::table('attendances', function (Blueprint $table) {
-            $table->string('course_id')->nullable();
-            $table->string('group')->nullable();
-            $table->string('lesson')->nullable();
-            $table->string('room')->nullable();
-            $table->string('device_id')->nullable();
-            $table->string('location')->nullable();
-            $table->string('source')->nullable();
-            $table->text('notes')->nullable();
+            if (! Schema::hasColumn('attendances', 'course_id')) {
+                $table->string('course_id')->nullable();
+            }
+
+            if (! Schema::hasColumn('attendances', 'group')) {
+                $table->string('group')->nullable();
+            }
+
+            if (! Schema::hasColumn('attendances', 'lesson')) {
+                $table->string('lesson')->nullable();
+            }
+
+            if (! Schema::hasColumn('attendances', 'room')) {
+                $table->string('room')->nullable();
+            }
+
+            if (! Schema::hasColumn('attendances', 'device_id')) {
+                $table->string('device_id')->nullable();
+            }
+
+            if (! Schema::hasColumn('attendances', 'location')) {
+                $table->string('location')->nullable();
+            }
+
+            if (! Schema::hasColumn('attendances', 'source')) {
+                $table->string('source')->nullable();
+            }
+
+            if (! Schema::hasColumn('attendances', 'notes')) {
+                $table->text('notes')->nullable();
+            }
         });
     }
 

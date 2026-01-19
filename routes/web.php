@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\OAuthController;  
+use App\Filament\Pages\StartAttendanceSession;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,4 +16,14 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/', function () {
     return auth()->check() ? redirect('/admin') : redirect('/admin');
-});
+}); 
+
+Route::get('/auth/redirect', [OAuthController::class, 'redirectToProvider'])
+    ->name('auth.redirect');
+
+Route::get('/auth/callback', [OAuthController::class, 'handleProviderCallback'])
+    ->name('auth.callback');
+
+Route::get('/attendance-sessions/{session}/csv', [StartAttendanceSession::class, 'downloadCsv'])
+    ->name('attendance.session.csv')
+    ->middleware(['auth']);
